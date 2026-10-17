@@ -1,5 +1,6 @@
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ public class SparkProbabilityCalculatorTest {
         testGreenProbability();
         testWhiteProbability();
         testRepeatedRuns();
+        testBundledUmaCatalog();
         testInvalidInputs();
         System.out.println("All probability calculator tests passed.");
     }
@@ -87,6 +89,30 @@ public class SparkProbabilityCalculatorTest {
         assertNear(0.0, SparkProbabilityCalculator.chanceOfAtLeastOneSuccess(0.5, 0));
         if (SparkProbabilityCalculator.runsForConfidence(1.0, 0.99) != 1) {
             throw new AssertionError("A guaranteed success must require one run.");
+        }
+    }
+
+    private static void testBundledUmaCatalog() {
+        List<String> catalog = UmaCatalog.entries();
+        if (catalog.size() != 69) {
+            throw new AssertionError("Expected 69 Global-released Uma records; got " + catalog.size());
+        }
+        Set<String> slugs = new HashSet<>();
+        Set<String> characterIds = new HashSet<>();
+        for (String entry : catalog) {
+            String[] fields = entry.split("\\|", -1);
+            if (fields.length != 2 || !fields[0].matches("[a-z0-9-]+")
+                    || !fields[1].matches("\\d{6}")) {
+                throw new AssertionError("Invalid bundled Uma record: " + entry);
+            }
+            if (!slugs.add(fields[0]) || !characterIds.add(fields[1])) {
+                throw new AssertionError("Duplicate bundled Uma slug or character ID: " + entry);
+            }
+        }
+        if (!slugs.contains("special-week") || !slugs.contains("zenno-rob-roy")
+                || !slugs.contains("narita-brian") || !slugs.contains("kitasan-black")
+                || slugs.contains("admire-groove") || slugs.contains("orfevre")) {
+            throw new AssertionError("The Global roster is missing released characters or includes unreleased entries.");
         }
     }
 

@@ -1,11 +1,16 @@
 # Uma Musume Spark Probability Calculator
 
-This project is the probability-engine foundation for estimating the chance of
-producing a trained Uma with selected blue, pink, green, and white factors.
-`Main` currently runs a small blue-factor example; the lineage-entry and
-interactive calculator UI are not implemented yet. The engine currently
-supports per-factor star intervals; aggregate minimum-count target evaluation
-is not implemented yet.
+This project estimates the chance of producing a trained Uma with selected
+spark factors. `Main` opens a desktop calculator with an interactive Uma
+lineage picker and a blue-factor probability panel. The lineage tree is for
+planning and display; it does not infer career stats or factor odds from
+parents.
+
+The picker includes 69 English Uma available in the Global game through
+October 17, 2026; costume variants use a single character entry. The catalog
+and any available portraits are loaded locally, and the application makes no
+network requests. Character artwork is not bundled; the picker uses its
+monogram fallback until you add portrait JPGs you have permission to use.
 
 ## Current model
 
@@ -34,26 +39,39 @@ lineage effects and career results must not be conflated. The sources also do
 not establish independence between factor rolls or repeated careers. Any
 user-supplied odds should therefore be labeled as estimates in a future UI.
 
+The current UI calculates blue-factor odds from the entered final stats,
+selected target stats, and star range. It reports the estimated number of
+independent careers needed to reach the selected confidence. Pink, green, and
+white factor probability controls are not yet exposed in the UI.
+
 ## References
 
 - [GameTora: Legacy Guide](https://gametora.com/umamusume/legacies) — factor
   generation, blue stat thresholds, inheritance overview, and rank caveats.
+- [Uma Guide: October 2026 Release Schedule](https://uma.guide/guides/release-schedule-october26)
+  — Global banner schedule used to set the roster cutoff.
 - [Parenting / Gene Guide](https://docs.google.com/document/d/1Q3IJKbtkplmuY-PAJMNjYiLtasv0eU0aIBEqp8_C3tg/edit)
   — community-reported factor and compatibility details; not all mechanics
   are independently documented by the game.
 
-## Running the current example
+## Running the calculator
 
-Compile with Java 17 or later:
+Compile with Java 17 or later and launch the desktop UI:
 
 ```powershell
-javac -d out src\SparkProbabilityCalculator.java src\Main.java
+javac -d out src\SparkProbabilityCalculator.java src\UmaCatalog.java src\SparkCalculatorWindow.java src\Main.java
 java -cp out Main
 ```
+
+The character catalog and monogram fallback are bundled with the application.
+Optional local portrait files should be named `assets\portraits\<slug>.jpg`
+(for example, `assets\portraits\special-week.jpg`). For packaged builds, put
+the same files in the classpath's `portraits` folder. Portraits are never
+downloaded by the app; add only images you have permission to use.
 
 The lightweight tests can be run without adding a test framework:
 
 ```powershell
-javac -d out src\SparkProbabilityCalculator.java test\SparkProbabilityCalculatorTest.java
+javac -d out src\SparkProbabilityCalculator.java src\UmaCatalog.java test\SparkProbabilityCalculatorTest.java
 java -cp out SparkProbabilityCalculatorTest
 ```
